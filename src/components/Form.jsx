@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { connect } from "react-redux";
-import phonebookActions from "../Redux/phonebook/phonebook-actions";
 
 import shortid from 'shortid';
 import s from './Phone.module.css';
 
-function Form({ contactList, onSubmit }) {
+import { useDispatch, useSelector } from "react-redux";
+import  {getContactList} from "../Redux/phonebook/phonebook-selectors";
+
+import { addContact } from '../Redux/phonebook/phonebook-actions';
+export default function Form() {
   const [newName, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const InputValue = e => {
+  const dispatch = useDispatch();
+  const state = useSelector(getContactList);
+
+  const InputValue = (e) => {
     const { name, value } = e.currentTarget;
 
     switch (name) {
@@ -24,11 +29,12 @@ function Form({ contactList, onSubmit }) {
     }
   };
 
-  const addContact = e => {
+  const addContacts = (e) => {
+    e.preventDefault();
+
     const lengthInputNameChech = newName.length;
     const lengthInputNumberChech = number.length;
 
-    e.preventDefault();
     if (lengthInputNameChech < 2 || lengthInputNumberChech > 10) {
       alert('Введите имя больше 1-го символам и не больше 10');
       return;
@@ -38,14 +44,7 @@ function Form({ contactList, onSubmit }) {
       return;
     }
 
-   // const checkName = contactList(name);
-    //if (checkName) {
-    //  alert('Это имя уже существует');
-
-     // return;
-    //}
-
-    onSubmit( newName, number, contactList);
+    onSubmit( newName, number, state);
     resetInputvalues();
   };
 
@@ -54,11 +53,23 @@ function Form({ contactList, onSubmit }) {
     setNumber('');
   };
 
+  const onCheckName = (contactList, newNameF) => {
+    return contactList.some(({ newName }) => newName === newNameF);
+  }
+
+  const onSubmit = (newName, number, contactList) => {
+    if (onCheckName(contactList, newName)) {
+      alert('Это имя существует ');
+      return;
+    }
+    dispatch(addContact(newName, number));
+  };
+
   const idName = shortid.generate();
   const idNumber = shortid.generate();
 
   return (
-    <form className={s.form} onSubmit={addContact}>
+    <form className={s.form} onSubmit={addContacts}>
       <label htmlFor={idName} className={s.labelName}>
         Name
       </label>
@@ -96,22 +107,3 @@ function Form({ contactList, onSubmit }) {
   );
 }
 
-
-const onCheckName = (contactList, newName) => {
-  return contactList.some(({ name }) => name === newName);
-};
-
-const mapStateToProps = (state) => ({
-  contactList: state.phonebook.contacts,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  onSubmit: (newName, number, contactList) => {
-    if (onCheckName(contactList, newName)) {
-      alert('Это имя уже существует');
-      return;
-    }
-    dispatch(phonebookActions.addContact(newName, number));
-  },
-});
-export default connect(mapStateToProps, mapDispatchToProps)(Form);

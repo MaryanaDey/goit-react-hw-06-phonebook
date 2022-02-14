@@ -1,9 +1,8 @@
 import React from 'react';
-//import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import s from './Phone.module.css';
 
-import phonebookActions from "../Redux/phonebook/phonebook-actions";
+import { veluesFilter} from "../Redux/phonebook/phonebook-actions";
 import { connect } from "react-redux";
 
 function SearchContact({ value, searchContact }) {
@@ -32,7 +31,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  searchContact: (e) => dispatch(phonebookActions.veluesFilter(e.target.value)),
+  searchContact: (e) => dispatch(veluesFilter(e.target.value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchContact);

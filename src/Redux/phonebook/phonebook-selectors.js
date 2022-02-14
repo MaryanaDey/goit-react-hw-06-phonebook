@@ -7,10 +7,8 @@ export const getFilterContacts = createSelector(
   [getContactList, getContactFilter],
 
   (allContacts, filter) => {
-    const normalizeFilter = filter.toLowerCase();
-    const contactsFilter = allContacts.filter(contact =>
-      contact.newName.toLowerCase().includes(normalizeFilter),
-    );
+    //const normalizeFilter = filter;
+    const contactsFilter = allContacts.filter(contact => contact);
     return contactsFilter;
   },
 );
